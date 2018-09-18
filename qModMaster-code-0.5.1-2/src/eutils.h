@@ -12,6 +12,8 @@ static const QString ModbusFunctionNames[]={"Read Coils (0x01)","Read Discrete I
 static const int ModbusFunctionCodes[]={0x1,0x2,0x3,0x4,0x5,0x6,0xf,0x10};
 static const QString ModbusModeStamp[]={"[RTU]>","[TCP]>",""};
 
+static const QString parity_name[] = {"None", "Odd", "Even"};
+
 class EUtils
 {
 private:
@@ -135,8 +137,12 @@ public:
     static QChar parity(QString p)
     {
         //the first char is what we need
+        //此处在多语言中，非英文时，会存在问题
+        //英文： None  Odd Even,首字母为 N O E,
         return p.at(0);
     }
+
+
 
     static enum {RTU = 0, TCP = 1, None = 0} ModbusMode;
 
