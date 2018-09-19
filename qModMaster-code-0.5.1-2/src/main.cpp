@@ -47,6 +47,9 @@ int main(int argc, char *argv[])
     //connect signals - slots
     QObject::connect(&modbus_adapt, SIGNAL(refreshView()), mainWin, SLOT(refreshView()));
     QObject::connect(mainWin, SIGNAL(resetCounters()), &modbus_adapt, SLOT(resetCounters()));
+
+    QObject::connect(&modbus_adapt,SIGNAL(sig_send_info(QString,InfoBar::InfoType)), mainWin, SLOT(s_showUpInfoBar(QString,InfoBar::InfoType)));
+
     mainWin->show();
 
     return app.exec();

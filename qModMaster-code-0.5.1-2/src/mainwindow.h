@@ -76,6 +76,8 @@ private slots:
     void loadSession();
     void saveSession();
 
+    void s_showUpInfoBar(QString message, InfoBar::InfoType type);
+
 signals:
     void resetCounters();
 

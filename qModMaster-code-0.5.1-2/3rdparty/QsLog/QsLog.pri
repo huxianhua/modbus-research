@@ -17,3 +17,5 @@ HEADERS += $$PWD/QSLogDest.h \
 OTHER_FILES += \
     $$PWD/QsLogChanges.txt \
     $$PWD/QsLogReadme.txt
+
+INCLUDEPATH += $$PWD

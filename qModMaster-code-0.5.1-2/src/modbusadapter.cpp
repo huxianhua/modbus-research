@@ -34,6 +34,7 @@ void ModbusAdapter::modbusConnectRTU(QString port, int baud, QChar parity, int d
 
     QLOG_INFO()<<  "Modbus Connect RTU";
 
+    //modbus_new_rtu("/dev/ttyUSB0", 115200, 'N', 8, 1);
     m_modbus = modbus_new_rtu(port.toLatin1().constData(),baud,parity.toLatin1(),dataBits,stopBits,RTS);
     line = "Connecting to Serial Port [" + port + "]...";
     QLOG_TRACE() <<  line;
@@ -46,19 +47,22 @@ void ModbusAdapter::modbusConnectRTU(QString port, int baud, QChar parity, int d
     m_timeOut = timeOut;
 
     if(m_modbus == NULL){
-        mainWin->showUpInfoBar(tr("Unable to create the libmodbus context."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Unable to create the libmodbus context."), InfoBar::Error);
+        emit sig_send_info(tr("Unable to create the libmodbus context."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection failed. Unable to create the libmodbus context";
         return;
     }
     else if(m_modbus && modbus_set_slave(m_modbus, m_slave) == -1){
         modbus_free(m_modbus);
-        mainWin->showUpInfoBar(tr("Invalid slave ID."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Invalid slave ID."), InfoBar::Error);
+        emit sig_send_info(tr("Invalid slave ID."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection failed. Invalid slave ID";
         return;
     }
     else if(m_modbus && modbus_connect(m_modbus) == -1) {
         modbus_free(m_modbus);
-        mainWin->showUpInfoBar(tr("Connection failed\nCould not connect to serial port."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Connection failed\nCould not connect to serial port."), InfoBar::Error);
+        emit sig_send_info(tr("Connection failed\nCould not connect to serial port."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection failed. Could not connect to serial port";
         m_connected = false;
         line += "Failed";
@@ -70,7 +74,8 @@ void ModbusAdapter::modbusConnectRTU(QString port, int baud, QChar parity, int d
         modbus_set_response_timeout(m_modbus, timeOut, 0);
         m_connected = true;
         line += "OK";
-        mainWin->hideInfoBar();
+        //[TODO: ]mainWin->hideInfoBar();
+        emit sig_send_info("hide",InfoBar::Hide);
         QLOG_TRACE() << line;
     }
 
@@ -95,13 +100,15 @@ void ModbusAdapter::modbusConnectTCP(QString ip, int port, int timeOut)
     QLOG_TRACE() <<  line;
     strippedIP = stripIP(ip);
     if (strippedIP == ""){
-        mainWin->showUpInfoBar(tr("Connection failed\nBlank IP Address."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Connection failed\nBlank IP Address."), InfoBar::Error);
+        emit sig_send_info(tr("Connection failed\nBlank IP Address."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection failed. Blank IP Address";
         return;
     }
     else {
         m_modbus = modbus_new_tcp(strippedIP.toLatin1().constData(), port);
-        mainWin->hideInfoBar();
+        //[TODO: ]mainWin->hideInfoBar();
+        emit sig_send_info("hide",InfoBar::Hide);
         QLOG_TRACE() <<  "Connecting to IP : " << ip << ":" << port;
     }
 
@@ -113,13 +120,15 @@ void ModbusAdapter::modbusConnectTCP(QString ip, int port, int timeOut)
     m_timeOut = timeOut;
 
     if(m_modbus == NULL){
-        mainWin->showUpInfoBar(tr("Unable to create the libmodbus context."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Unable to create the libmodbus context."), InfoBar::Error);
+        emit sig_send_info(tr("Unable to create the libmodbus context."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection failed. Unable to create the libmodbus context";
         return;
     }
     else if(m_modbus && modbus_connect(m_modbus) == -1) {
         modbus_free(m_modbus);
-        mainWin->showUpInfoBar(tr("Connection failed\nCould not connect to TCP port."), InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(tr("Connection failed\nCould not connect to TCP port."), InfoBar::Error);
+        emit sig_send_info(tr("Connection failed\nCould not connect to TCP port."), InfoBar::Error);
         QLOG_ERROR()<<  "Connection to IP : " << ip << ":" << port << "...failed. Could not connect to TCP port";
         m_connected = false;
         line += " Failed";
@@ -131,7 +140,8 @@ void ModbusAdapter::modbusConnectTCP(QString ip, int port, int timeOut)
         modbus_set_response_timeout(m_modbus, timeOut, 0);
         m_connected = true;
         line += " OK";
-        mainWin->hideInfoBar();
+        //[TODO: ]mainWin->hideInfoBar();
+        emit sig_send_info("hide",InfoBar::Hide);
         QLOG_TRACE() << line;
     }
 
@@ -254,7 +264,8 @@ void ModbusAdapter::modbusReadData(int slave, int functionCode, int startAddress
                 int data = is16Bit ? dest16[i] : dest[i];
                 regModel->setValue(i,data);
             }
-            mainWin->hideInfoBar();
+            //[TODO: ]mainWin->hideInfoBar();
+            emit sig_send_info("hide",InfoBar::Hide);
     }
     else
     {
@@ -276,7 +287,8 @@ void ModbusAdapter::modbusReadData(int slave, int functionCode, int startAddress
                 line = QString(tr("Read data failed.\nNumber of registers returned does not match number of registers requested!. Error : "))  +  EUtils::libmodbus_strerror(errno);
         }
 
-        mainWin->showUpInfoBar(line, InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(line, InfoBar::Error);
+        emit sig_send_info(line,InfoBar::Error);
         modbus_flush(m_modbus); //flush data
      }
 
@@ -339,7 +351,8 @@ void ModbusAdapter::modbusWriteData(int slave, int functionCode, int startAddres
     {
         //values written correctly
         rawModel->addLine(EUtils::SysTimeStamp() + " - values written correctly.");
-        mainWin->hideInfoBar();
+        //[TODO: ]mainWin->hideInfoBar();
+        emit sig_send_info("hide",InfoBar::Hide);
     }
     else
     {
@@ -361,7 +374,8 @@ void ModbusAdapter::modbusWriteData(int slave, int functionCode, int startAddres
                 line = QString(tr("Write data failed.\nNumber of registers returned does not match number of registers requested!. Error : "))  +  EUtils::libmodbus_strerror(errno);
          }
 
-        mainWin->showUpInfoBar(line, InfoBar::Error);
+        //[TODO: ]mainWin->showUpInfoBar(line, InfoBar::Error);
+        emit sig_send_info(line,InfoBar::Error);
         modbus_flush(m_modbus); //flush data
      }
 

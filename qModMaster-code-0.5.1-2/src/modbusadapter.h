@@ -7,6 +7,8 @@
 #include "rawdatamodel.h"
 #include <QTimer>
 #include "eutils.h"
+#include "infobar.h"
+
 
 class ModbusAdapter : public QObject
 {
@@ -57,6 +59,16 @@ private:
 
 signals:
     void refreshView();
+
+    /**
+     * @brief sig_send_info
+     * @param info              当发送 hide 时 就调用 mainWin->hideInfoBar();
+     * @param type
+     */
+    //InfoBar::InfoType type
+    //void sig_send_info(QString info,int code);
+    void sig_send_info(QString info,InfoBar::InfoType type);
+
 
 public slots:
     void modbusTransaction();
