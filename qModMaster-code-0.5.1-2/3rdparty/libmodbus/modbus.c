@@ -1840,7 +1840,6 @@ void modbus_mapping_free(modbus_mapping_t *mb_mapping)
  * will be copied.  Always NUL terminates (unless dest_size == 0).  Returns
  * strlen(src); if retval >= dest_size, truncation occurred.
  */
-#if defined(Q_OS_WIN32) || defined(Q_OS_LINUX)
 size_t strlcpy(char *dest, const char *src, size_t dest_size)
 {
     register char *d = dest;
@@ -1865,5 +1864,4 @@ size_t strlcpy(char *dest, const char *src, size_t dest_size)
 
     return (s - src - 1); /* count does not include NUL */
 }
-#endif
 #endif

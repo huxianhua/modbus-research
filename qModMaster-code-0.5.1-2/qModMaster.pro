@@ -12,7 +12,6 @@ TEMPLATE = app
 
 SOURCES += src/main.cpp \
     src/mainwindow.cpp \
-    3rdparty/libmodbus/modbus.c \
     forms/about.cpp \
     forms/settingsmodbusrtu.cpp \
     forms/settingsmodbustcp.cpp \
@@ -22,9 +21,6 @@ SOURCES += src/main.cpp \
     src/rawdatamodel.cpp \
     forms/settings.cpp \
     forms/busmonitor.cpp \
-    3rdparty/libmodbus/modbus-data.c \
-    3rdparty/libmodbus/modbus-tcp.c \
-    3rdparty/libmodbus/modbus-rtu.c \
     src/rawdatadelegate.cpp \
     src/registersdatadelegate.cpp \
     src/modbuscommsettings.cpp \
@@ -35,7 +31,6 @@ SOURCES += src/main.cpp \
     src/infobar.cpp
 
 HEADERS  += src/mainwindow.h \
-    3rdparty/libmodbus/modbus.h \
     forms/about.h \
     forms/settingsmodbusrtu.h \
     forms/settingsmodbustcp.h \
@@ -55,6 +50,10 @@ HEADERS  += src/mainwindow.h \
     3rdparty/QsLog/QsLogDisableForThisFile.h \
     3rdparty/QsLog/QsLogDestFile.h \
     src/infobar.h
+
+
+include(3rdparty/libmodbus/libmodbus.pri)
+
 
 INCLUDEPATH += 3rdparty/libmodbus \
     3rdparty/QsLog
