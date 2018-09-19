@@ -1,6 +1,8 @@
 #ifndef MODBUSADAPTER_H
 #define MODBUSADAPTER_H
 
+
+
 #include <QObject>
 #include "modbus.h"
 #include "registersmodel.h"
@@ -9,7 +11,10 @@
 #include "eutils.h"
 #include "infobar.h"
 
-
+/**
+ * @brief The ModbusAdapter class
+ *          对 libmodbus 的封装
+ */
 class ModbusAdapter : public QObject
 {
     Q_OBJECT
@@ -19,6 +24,17 @@ public:
      void busMonitorRequestData(uint8_t * data,uint8_t dataLen);
      void busMonitorResponseData(uint8_t * data,uint8_t dataLen);
 
+     // //modbus_new_rtu("/dev/ttyUSB0", 115200, 'N', 8, 1);
+     /**
+      * @brief modbusConnectRTU  RTU 连接
+      * @param port         linux (/dev/ttyUSB0)  windows (com3)
+      * @param baud         波特率 9600, 19200, 57600, 115200, etc
+      * @param parity       奇偶    无 奇 偶  'N', 'O', 'E'
+      * @param dataBits     数据位数  7 ， 8
+      * @param stopBits     停止位数   1  1.5  2
+      * @param RTS          RTS    None Up Down
+      * @param timeOut      响应时间 ,默认为 1s
+      */
      void modbusConnectRTU(QString port, int baud, QChar parity, int dataBits, int stopBits, int RTS, int timeOut=1);
      void modbusConnectTCP(QString ip, int port, int timeOut=1);
      void modbusDisConnect();

@@ -34,7 +34,6 @@ void ModbusAdapter::modbusConnectRTU(QString port, int baud, QChar parity, int d
 
     QLOG_INFO()<<  "Modbus Connect RTU";
 
-    //modbus_new_rtu("/dev/ttyUSB0", 115200, 'N', 8, 1);
     m_modbus = modbus_new_rtu(port.toLatin1().constData(),baud,parity.toLatin1(),dataBits,stopBits,RTS);
     line = "Connecting to Serial Port [" + port + "]...";
     QLOG_TRACE() <<  line;
