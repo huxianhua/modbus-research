@@ -12,29 +12,10 @@ HEADERS  += \
     $$PWD/config.h
 
 SOURCES += \
-    $$PWD/modbus.c \    
+    $$PWD/modbus.c \
     $$PWD/modbus-data.c \
     $$PWD/modbus-tcp.c \
-    $$PWD/modbus-rtu.c 
-    
+    $$PWD/modbus-rtu.c
+
 
 INCLUDEPATH += $$PWD
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

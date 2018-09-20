@@ -23,11 +23,13 @@ QWidget *RegistersDataDelegate::createEditor(QWidget *parent,
 
     if (m_base == 2) {//Bin
             if (m_is16Bit) {
+                //16位 二进制 如  0000 0000 0000 0000
                 QLineEdit *editor = new QLineEdit(parent);
                 editor->setInputMask("bbbbbbbbbbbbbbbb");
                 return editor;
             }
             else {
+                //单位 二进制
                 QSpinBox *editor = new QSpinBox(parent);
                 editor->setMinimum(0);
                 editor->setMaximum(1);
@@ -36,6 +38,7 @@ QWidget *RegistersDataDelegate::createEditor(QWidget *parent,
     }
     else if (m_base == 10) {//Dec
             QLineEdit *editor = new QLineEdit(parent);
+            //匹配 0个或1个负号， 0 ~ 9 的数字，长度为 1 ~ 5 位
             QRegExp rx("-{0,1}[0-9]{1,5}");
             QValidator *validator = new QRegExpValidator(rx);
             editor->setValidator(validator);
@@ -43,10 +46,11 @@ QWidget *RegistersDataDelegate::createEditor(QWidget *parent,
     }
     else if (m_base == 16) {//Hex
             QLineEdit *editor = new QLineEdit(parent);
+            //Hexadecimal character required. A-F, a-f, 0-9.
             editor->setInputMask("hhhh");
             return editor;
     }
-    else {//Default = Dec
+    else {//Default = Dec  默认使用 十进制
             QLineEdit *editor = new QLineEdit(parent);
             QRegExp rx("-{0,1}[0-9]{1,5}");
             QValidator *validator = new QRegExpValidator(rx);

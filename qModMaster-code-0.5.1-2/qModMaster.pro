@@ -2,6 +2,7 @@
 #
 # Project created by QtCreator 2010-11-24T09:57:26
 #
+# https://www.jianshu.com/p/d93c17485c0a libmodbus 手册翻译
 #-------------------------------------------------
 
 QT       += core gui

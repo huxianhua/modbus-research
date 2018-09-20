@@ -13,7 +13,8 @@ class InfoBar : public QFrame
         enum InfoType {
             Question,
             Warning,
-            Error
+            Error,
+            Hide
         };
 
         InfoBar(QWidget *parent = 0);

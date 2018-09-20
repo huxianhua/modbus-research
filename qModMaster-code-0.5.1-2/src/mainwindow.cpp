@@ -504,12 +504,12 @@ void MainWindow::request()
     QLOG_TRACE()<<  "Request transaction. No or registers = " <<  rowCount;
 
     if (rowCount == 0) {
-        mainWin->showUpInfoBar(tr("Request failed\nAdd items to Registers Table."), InfoBar::Error);
+        showUpInfoBar(tr("Request failed\nAdd items to Registers Table."), InfoBar::Error);
         QLOG_WARN()<<  "Request failed. No items in registers table ";
         return;
     }
     else {
-        mainWin->hideInfoBar();
+        hideInfoBar();
     }
 
     //get base address
@@ -533,13 +533,13 @@ void MainWindow::scan(bool value)
    int baseAddr;
 
    if (value && rowCount == 0) {
-       mainWin->showUpInfoBar(tr("Request failed\nAdd items to Registers Table."), InfoBar::Error);
+       showUpInfoBar(tr("Request failed\nAdd items to Registers Table."), InfoBar::Error);
        QLOG_WARN()<<  "Request failed. No items in registers table ";
        ui->actionScan->setChecked(false);
        return;
    }
    else {
-       mainWin->hideInfoBar();
+       hideInfoBar();
    }
 
    //get base address
@@ -588,6 +588,9 @@ void MainWindow::modbusConnect(bool connect)
     if (connect) { //RTU
         if (ui->cmbModbusMode->currentIndex() == EUtils::RTU) {
             m_modbus->setSlave(ui->sbSlaveID->value());
+
+            // "com3", 115200, 'N', 8, 1
+
             m_modbus->modbusConnectRTU(m_modbusCommSettings->serialPortName(),
                                         m_modbusCommSettings->baud().toInt(),
                                         EUtils::parity(m_modbusCommSettings->parity()),
@@ -683,6 +686,18 @@ QString fName;
 void MainWindow::showUpInfoBar(QString message, InfoBar::InfoType type)
 {
     ui->infobar->show(message, type);
+}
+
+void MainWindow::s_showUpInfoBar(QString message, InfoBar::InfoType type)
+{
+    if(type == InfoBar::Hide)
+    {
+        hideInfoBar();
+    }else
+    {
+        ui->infobar->show(message, type);
+    }
+
 }
 
 void MainWindow::hideInfoBar()
