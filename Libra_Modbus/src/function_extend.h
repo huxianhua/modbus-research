@@ -8,11 +8,23 @@
 
 #include "modbuscommsettings.h"
 
+
+#include "settingsmodbusrtu.h"
+#include "settingsmodbustcp.h"
+#include "settings.h"
+#include "busmonitor.h"
+#include "modbusadapter.h"
+
+
 class Function_Extend : public QObject
 {
     Q_OBJECT
 public:
     explicit Function_Extend(QObject *parent = 0);
+
+   // explicit Function_Extend(QWidget *parent = 0, ModbusAdapter *adapter = 0, ModbusCommSettings *settings = 0);
+
+
     static Function_Extend &instaned()
     {
         static Function_Extend qinstance;
