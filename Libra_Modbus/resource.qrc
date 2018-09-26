@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file>resource/qml/main.qml</file>
+        <file>resource/qml/DashboardGaugeStyle.qml</file>
+    </qresource>
+</RCC>

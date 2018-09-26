@@ -1,0 +1,83 @@
+INCLUDEPATH += $$PWD
+
+RESOURCES += analogwidgets.qrc 
+
+HEADERS += $$PWD/../analogwidgets/$$PWD/chart/chartdecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/channeldata.h \
+           $$PWD/../analogwidgets/$$PWD/chart/channel.h \
+           $$PWD/../analogwidgets/$$PWD/chart/datacontainers.h \
+           $$PWD/../analogwidgets/$$PWD/chart/standard/labelsdecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/standard/legenddecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/standard/scalegriddecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/standard/glassdecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/standard/channeldecorator.h \
+           $$PWD/../analogwidgets/$$PWD/chart/scalegrid.h \
+           $$PWD/../analogwidgets/led.h \
+           $$PWD/../analogwidgets/functions.h \
+           $$PWD/../analogwidgets/manometer.h \
+           $$PWD/../analogwidgets/chart.h \
+           $$PWD/../analogwidgets/thermometer.h \
+           $$PWD/defines.h \
+           $$PWD/../analogwidgets/abstractmeter.h \
+           $$PWD/../analogwidgets/wallclock.h \
+           $$PWD/../analogwidgets/widgetwithbackground.h \
+           $$PWD/../analogwidgets/bitmapbutton.h \
+	   $$PWD/../analogwidgets/counter.h \
+	   $$PWD/../analogwidgets/scriptwidget.h \
+	   $$PWD/../analogwidgets/potentiometer.h \
+	   item.h 
+	   
+SOURCES += $$PWD/chart/scalegrid.cpp \
+           $$PWD/chart/standard/labelsdecorator.cpp \
+           $$PWD/chart/standard/glassdecorator.cpp \
+           $$PWD/chart/standard/channeldecorator.cpp \
+           $$PWD/chart/standard/legenddecorator.cpp \
+           $$PWD/chart/standard/scalegriddecorator.cpp \
+           $$PWD/chart/channel.cpp \
+           $$PWD/chart.cpp \
+           $$PWD/functions.cpp \
+           $$PWD/led.cpp \
+           $$PWD/manometer.cpp \
+           $$PWD/thermometer.cpp \
+           $$PWD/wallclock.cpp \
+           $$PWD/chart/chartdecorator.cpp \
+           $$PWD/abstractmeter.cpp \
+           $$PWD/widgetwithbackground.cpp \
+           $$PWD/bitmapbutton.cpp \
+	   $$PWD/counter.cpp \
+	   $$PWD/scriptwidget.cpp \
+	   $$PWD/potentiometer.cpp 
+	   
+
+
+INCLUDEPATH += $$PWD/.. \ 
+               $$PWD/../analogwidgets 
+
+	       
+include (../../Flags.pri )
+OBJECTS_DIR = ../objects
+TARGET = analogwidgets
+DESTDIR = ../
+CONFIG += release \
+warn_on \
+staticlib
+TEMPLATE = lib
+
+
+headers.files += $$PWD/../analogwidgets/*.h
+headers_chart.files += $$PWD/../analogwidgets/$$PWD/chart/*.h
+headers_standard.files += $$PWD/../analogwidgets/$$PWD/chart/standard/*.h 
+headers.path += $$INSTALL_INCLUDEDIR/analogwidgets
+headers_chart.path += $$INSTALL_INCLUDEDIR/analogwidgets/chart
+headers_standard.path += $$INSTALL_INCLUDEDIR/analogwidgets/$$PWD/chart/standard 
+
+staticlib.files += ../libanalogwidgets.a 
+staticlib.path += $$INSTALL_LIBDIR/ 
+
+
+INSTALLS += headers headers_chart headers_standard staticlib 
+
+
+WIN32{
+  DEFINES+= WIN32
+}

@@ -1,0 +1,83 @@
+#include <QApplication>
+#include <stdio.h>
+#include <stdlib.h>
+#include <QDir>
+#include <QTranslator>
+#include <QStyleFactory>
+
+#include "app_config.h"
+
+#include "QsLog.h"
+#include "QsLogDest.h"
+#include "mainwindow.h"
+#include "modbusadapter.h"
+#include "modbuscommsettings.h"
+
+#include "modbuswindow.h"
+
+#include "function_extend.h"
+
+
+QTranslator *Translator;
+
+//Logging Levels
+//TraceLevel : 0
+//DebugLevel : 1
+//InfoLevel : 2
+//WarnLevel : 3
+//ErrorLevel : 4
+//FatalLevel : 5
+//OffLevel : 6
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    Translator = new QTranslator;
+    Translator->load(":/translations/" + QCoreApplication::applicationName() + "_" + QLocale::system().name());
+    app.installTranslator(Translator);
+
+    //init the logging mechanism
+    QsLogging::Logger& logger = QsLogging::Logger::instance();
+    logger.setLoggingLevel(QsLogging::OffLevel); // start with no logging
+    const QString sLogPath(QDir(app.applicationDirPath()).filePath(QString("%1.log").arg(AppName)));
+    QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(sLogPath,true,65535,2));
+    QsLogging::DestinationPtr debugDestination(QsLogging::DestinationFactory::MakeDebugOutputDestination());
+    logger.addDestination(debugDestination);
+    logger.addDestination(fileDestination);
+
+    //Modbus Adapter
+    ModbusAdapter modbus_adapt(NULL);
+    //Program settings
+    ModbusCommSettings settings(QString("%1.ini").arg(AppName));
+    //扩展功能必须首先调用
+    Function_Extend::instaned().set_settings(&settings);
+
+    Function_Extend::instaned().set_default_font();
+    Function_Extend::instaned().set_default_style();
+
+
+#if 0
+    //show main window
+    mainWin = new MainWindow(NULL, &modbus_adapt, &settings);
+    //connect signals - slots
+    QObject::connect(&modbus_adapt, SIGNAL(refreshView()), mainWin, SLOT(refreshView()));
+    QObject::connect(mainWin, SIGNAL(resetCounters()), &modbus_adapt, SLOT(resetCounters()));
+
+    QObject::connect(&modbus_adapt,SIGNAL(sig_send_info(QString,InfoBar::InfoType)), mainWin, SLOT(s_showUpInfoBar(QString,InfoBar::InfoType)));
+
+    mainWin->show();
+#else
+    //show main window
+    modbuswindow = new ModbusWindow(NULL, &modbus_adapt, &settings);
+    //connect signals - slots
+    QObject::connect(&modbus_adapt, SIGNAL(refreshView()), modbuswindow, SLOT(refreshView()));
+    QObject::connect(modbuswindow, SIGNAL(resetCounters()), &modbus_adapt, SLOT(resetCounters()));
+
+    QObject::connect(&modbus_adapt,SIGNAL(sig_send_info(QString,InfoBar::InfoType)), modbuswindow, SLOT(s_showUpInfoBar(QString,InfoBar::InfoType)));
+
+    modbuswindow->show();
+#endif
+    return app.exec();
+
+}
