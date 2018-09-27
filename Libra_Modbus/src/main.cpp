@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
     //Program settings
     ModbusCommSettings settings(QString("%1.ini").arg(AppName));
     //扩展功能必须首先调用
-    Function_Extend::instaned().set_settings(&settings);
+    Function_Extend extend(NULL, &modbus_adapt, &settings);
 
-    Function_Extend::instaned().set_default_font();
-    Function_Extend::instaned().set_default_style();
+    extend.set_default_font();
+    extend.set_default_style();
 
 
 #if 0
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     mainWin->show();
 #else
     //show main window
-    modbuswindow = new ModbusWindow(NULL, &modbus_adapt, &settings);
+    modbuswindow = new ModbusWindow(NULL, &modbus_adapt, &settings,&extend);
     //connect signals - slots
     QObject::connect(&modbus_adapt, SIGNAL(refreshView()), modbuswindow, SLOT(refreshView()));
     QObject::connect(modbuswindow, SIGNAL(resetCounters()), &modbus_adapt, SLOT(resetCounters()));

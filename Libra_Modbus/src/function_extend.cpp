@@ -17,17 +17,24 @@
 #include "manometer.h"
 
 
-Function_Extend::Function_Extend(QObject *parent) : QObject(parent)
-{
+//Function_Extend::Function_Extend(QObject *parent) : QObject(parent)
+//{
+//}
 
-}
-void Function_Extend::set_settings(ModbusCommSettings *settings)
+//ModbusWindow::ModbusWindow(QWidget *parent, ModbusAdapter *adapter, ModbusCommSettings *settings) :
+//    QMainWindow(parent), m_modbus(adapter), m_modbusCommSettings(settings),
+//    ui(new Ui::ModbusWindow)
+
+
+Function_Extend::Function_Extend(QWidget *parent, ModbusAdapter *adapter, ModbusCommSettings *settings) :
+    QObject(parent),m_modbus(adapter),m_modbusCommSettings(settings)
 {
     m_modbusCommSettings = settings;
     //Logging level
     QsLogging::Logger::instance().setLoggingLevel((QsLogging::Level)m_modbusCommSettings->loggingLevel());
     QLOG_INFO()<<  "Start Program" ;
 }
+
 
 void Function_Extend::set_default_font()
 {
@@ -138,5 +145,60 @@ void Function_Extend::add_tab_widget_content(QTabWidget *tabWidget)
     emit sig_init("xxxxx");
 
     tabWidget->setCurrentIndex(3);
+
+}
+void Function_Extend::setModbusPara(int slave, int functionCode, int startAddress)
+{
+    m_slave = slave;
+    m_functionCode = functionCode;
+    m_startAddress = startAddress;
+
+}
+void Function_Extend::readModbus(int slave, int functionCode, int startAddress,int noOfItems)
+{
+    QVariantMap result = m_modbus->modbusReadData_simple(slave,functionCode,startAddress,noOfItems);
+
+    //int result_count = result.count();
+
+    if(result.contains("error"))
+    {
+        qFatal("[%s - %s - %d]\t (%s)",__FILE__,__FUNCTION__,__LINE__,result["error"].toString().toUtf8().data());
+    }else
+    if(result.contains("value"))
+    {
+        QStringList value_list = result["value"].toStringList();
+        QString value;
+
+        qDebug("打印 Modbus 读取结果:");
+        int value_count = value_list.count();
+        for(int index = 0; index < value_count; index++)
+        {
+            value = value_list.at(index);
+
+            qDebug("value[%d] -- (%s)",index,value.toUtf8().data());
+        }
+    }else
+    {
+        qFatal("[%s - %s - %d]",__FILE__,__FUNCTION__,__LINE__);
+    }
+}
+void Function_Extend::s_zeroCalibration_1a()
+{
+    readModbus(m_slave, 0x01, 2000 , 1);
+}
+void Function_Extend::s_zeroCalibration_2a()
+{
+
+}
+void Function_Extend::s_zeroCalibration_3a()
+{
+    readModbus(m_slave, 0x04, 20000 , 1);
+}
+void Function_Extend::s_zeroCalibration_4a()
+{
+
+}
+void Function_Extend::s_zeroCalibration_5a()
+{
 
 }

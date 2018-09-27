@@ -18,8 +18,8 @@
 
 ModbusWindow *modbuswindow;
 
-ModbusWindow::ModbusWindow(QWidget *parent, ModbusAdapter *adapter, ModbusCommSettings *settings) :
-    QMainWindow(parent), m_modbus(adapter), m_modbusCommSettings(settings),
+ModbusWindow::ModbusWindow(QWidget *parent, ModbusAdapter *adapter, ModbusCommSettings *settings,Function_Extend *extend) :
+    QMainWindow(parent), m_modbus(adapter), m_modbusCommSettings(settings),m_extend(extend),
     ui(new Ui::ModbusWindow)
 {
     //setup UI
@@ -121,13 +121,15 @@ ModbusWindow::ModbusWindow(QWidget *parent, ModbusAdapter *adapter, ModbusCommSe
     addDockWidget(Qt::LeftDockWidgetArea, m_dock);
 
 
-    Function_Extend::instaned().add_os_style(ui->menuBar,ui->mainToolBar);
-    Function_Extend::instaned().add_tab_widget_content(ui->tabWidget);
+    m_extend->add_os_style(ui->menuBar,ui->mainToolBar);
+    m_extend->add_tab_widget_content(ui->tabWidget);
 
 
     //Update UI
     updateStatusBar();
     refreshView();
+
+    initExtend();
 
     //Logging level
     QsLogging::Logger::instance().setLoggingLevel((QsLogging::Level)m_modbusCommSettings->loggingLevel());
@@ -136,6 +138,9 @@ ModbusWindow::ModbusWindow(QWidget *parent, ModbusAdapter *adapter, ModbusCommSe
     resize(1024,768);
 
 }
+
+
+//pbtn_t1_01
 
 ModbusWindow::~ModbusWindow()
 {
@@ -147,6 +152,132 @@ ModbusWindow::~ModbusWindow()
     QLOG_INFO()<<  "Stop Program" ;
 
 }
+
+void ModbusWindow::initExtend()
+{
+    connect(ui->pbtn_t1_01,SIGNAL(released()),this,SLOT(s_zeroCalibration_1a()));
+    connect(ui->pbtn_t1_03,SIGNAL(released()),this,SLOT(s_zeroCalibration_3a()));
+
+}
+
+void ModbusWindow::s_zeroCalibration_1a()
+{
+
+    if(!m_modbus->isConnected())
+    {
+        return;
+    }
+
+   //get base address
+   int baseAddr = m_modbusCommSettings->baseAddr().toInt();
+
+   int slave = ui->sbSlaveID->value();
+   int functionCode = 0x01;
+   int startAddress = 2000 + baseAddr;
+   int noOfItems = 1;
+
+   QVariantMap result;
+
+   QApplication::setOverrideCursor(Qt::WaitCursor);
+
+   switch(functionCode)
+   {
+           case MODBUS_FC_READ_COILS:
+           case MODBUS_FC_READ_DISCRETE_INPUTS:
+           case MODBUS_FC_READ_HOLDING_REGISTERS:
+           case MODBUS_FC_READ_INPUT_REGISTERS:
+                   //modbusReadData(m_slave,m_functionCode,m_startAddr,m_numOfRegs);
+                   result = m_modbus->modbusReadData_simple(slave, functionCode, startAddress, noOfItems);
+                   break;
+
+           case MODBUS_FC_WRITE_SINGLE_COIL:
+           case MODBUS_FC_WRITE_SINGLE_REGISTER:
+           case MODBUS_FC_WRITE_MULTIPLE_COILS:
+           case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
+                   //modbusWriteData(m_slave,m_functionCode,m_startAddr,m_numOfRegs);
+                   break;
+           default:
+                   break;
+   }
+   QApplication::setOverrideCursor(Qt::ArrowCursor);
+
+
+   if(result.contains("error"))
+   {
+       qFatal("[%s - %s - %d]\t (%s)",__FILE__,__FUNCTION__,__LINE__,result["error"].toString().toUtf8().data());
+   }else
+   if(result.contains("value"))
+   {
+       QStringList value_list = result["value"].toStringList();
+       QString value;
+
+       qDebug("打印 Modbus 读取结果:");
+       int value_count = value_list.count();
+       for(int index = 0; index < value_count; index++)
+       {
+           value = value_list.at(index);
+
+           qDebug("value[%d] -- (%s)",index,value.toUtf8().data());
+       }
+   }else
+   {
+       qFatal("[%s - %s - %d]",__FILE__,__FUNCTION__,__LINE__);
+   }
+
+
+}
+void ModbusWindow::s_zeroCalibration_2a()
+{
+
+}
+void ModbusWindow::s_zeroCalibration_3a()
+{
+
+}
+void ModbusWindow::s_zeroCalibration_4a()
+{
+
+}
+void ModbusWindow::s_zeroCalibration_5a()
+{
+
+}
+
+
+
+
+/*
+void MainWindow::request()
+{
+
+     //Request items from modbus adapter and add raw data to raw data model
+    int rowCount = m_modbus->regModel->model->rowCount();
+    int baseAddr;
+
+    QLOG_TRACE()<<  "Request transaction. No or registers = " <<  rowCount;
+
+    if (rowCount == 0) {
+        showUpInfoBar(tr("Request failed\nAdd items to Registers Table."), InfoBar::Error);
+        QLOG_WARN()<<  "Request failed. No items in registers table ";
+        return;
+    }
+    else {
+        hideInfoBar();
+    }
+
+    //get base address
+    baseAddr = m_modbusCommSettings->baseAddr().toInt();
+
+    m_modbus->setSlave(ui->sbSlaveID->value());
+    m_modbus->setFunctionCode(EUtils::ModbusFunctionCode(ui->cmbFunctionCode->currentIndex()));
+    m_modbus->setStartAddr(ui->sbStartAddress->value() + baseAddr);
+    m_modbus->setNumOfRegs(ui->sbNoOfRegs->value());
+
+    //Modbus data
+    m_modbus->modbusTransaction();
+
+}*/
+
 
 void ModbusWindow::showSettingsModbusRTU()
 {
@@ -670,6 +801,8 @@ void ModbusWindow::modbusConnect(bool connect)
     ui->actionRead_Write->setEnabled(m_modbus->isConnected());
     ui->actionScan->setEnabled(m_modbus->isConnected());
     ui->cmbModbusMode->setEnabled(!m_modbus->isConnected());
+
+    //m_extend->setModbusPara();
 
  }
 
