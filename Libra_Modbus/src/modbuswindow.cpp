@@ -162,12 +162,6 @@ void ModbusWindow::initExtend()
 
 void ModbusWindow::s_zeroCalibration_1a()
 {
-
-    if(!m_modbus->isConnected())
-    {
-        return;
-    }
-
    //get base address
    int baseAddr = m_modbusCommSettings->baseAddr().toInt();
 
@@ -177,7 +171,7 @@ void ModbusWindow::s_zeroCalibration_1a()
    int noOfItems = 1;
 
    QVariantMap result;
-
+#if 0
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
    switch(functionCode)
@@ -200,7 +194,9 @@ void ModbusWindow::s_zeroCalibration_1a()
                    break;
    }
    QApplication::setOverrideCursor(Qt::ArrowCursor);
-
+#else
+   result = readRequest( slave,  functionCode,  startAddress, noOfItems);
+#endif
 
    if(result.contains("error"))
    {
@@ -232,7 +228,39 @@ void ModbusWindow::s_zeroCalibration_2a()
 }
 void ModbusWindow::s_zeroCalibration_3a()
 {
+    //get base address
+    int baseAddr = m_modbusCommSettings->baseAddr().toInt();
 
+    int slave = ui->sbSlaveID->value();
+    int functionCode = 0x04;
+    int startAddress = 20000 + baseAddr;
+    int noOfItems = 1;
+
+    QVariantMap result;
+
+    result = readRequest( slave,  functionCode,  startAddress, noOfItems);
+
+    if(result.contains("error"))
+    {
+        qFatal("[%s - %s - %d]\t (%s)",__FILE__,__FUNCTION__,__LINE__,result["error"].toString().toUtf8().data());
+    }else
+    if(result.contains("value"))
+    {
+        QStringList value_list = result["value"].toStringList();
+        QString value;
+
+        qDebug("打印 Modbus 读取结果:");
+        int value_count = value_list.count();
+        for(int index = 0; index < value_count; index++)
+        {
+            value = value_list.at(index);
+
+            qDebug("value[%d] -- (%s)",index,value.toUtf8().data());
+        }
+    }else
+    {
+        qFatal("[%s - %s - %d]",__FILE__,__FUNCTION__,__LINE__);
+    }
 }
 void ModbusWindow::s_zeroCalibration_4a()
 {
@@ -244,8 +272,87 @@ void ModbusWindow::s_zeroCalibration_5a()
 }
 
 
+QVariantMap ModbusWindow::readRequest(int slave, int functionCode, int startAddress,int noOfItems)
+{
+    QVariantMap result;
+
+    if(!m_modbus->isConnected())
+    {
+        qFatal("[%s - %s - %d] -- modbus 未连接！",__FILE__,__FUNCTION__,__LINE__);
+        return result;
+    }
 
 
+   //get base address
+   int baseAddr = m_modbusCommSettings->baseAddr().toInt();
+
+   QApplication::setOverrideCursor(Qt::WaitCursor);
+
+   switch(functionCode)
+   {
+           case MODBUS_FC_READ_COILS:
+           case MODBUS_FC_READ_DISCRETE_INPUTS:
+           case MODBUS_FC_READ_HOLDING_REGISTERS:
+           case MODBUS_FC_READ_INPUT_REGISTERS:
+                   //modbusReadData(m_slave,m_functionCode,m_startAddr,m_numOfRegs);
+                   result = m_modbus->modbusReadData_simple(slave, functionCode, startAddress + baseAddr, noOfItems);
+                   break;
+
+           case MODBUS_FC_WRITE_SINGLE_COIL:
+           case MODBUS_FC_WRITE_SINGLE_REGISTER:
+           case MODBUS_FC_WRITE_MULTIPLE_COILS:
+           case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
+                   //modbusWriteData(m_slave,m_functionCode,m_startAddr,m_numOfRegs);
+                    qFatal("[%s - %s - %d] -- modbus 功能码调用异常 -- (%d) ",__FILE__,__FUNCTION__,__LINE__,functionCode);
+                   break;
+           default:
+                   break;
+   }
+   QApplication::setOverrideCursor(Qt::ArrowCursor);
+
+    return result;
+
+}
+/*
+void ModbusWindow::writeRequest(int slave, int functionCode, int startAddress,int noOfItems)
+{
+
+    if(!m_modbus->isConnected())
+    {
+        qFatal("[%s - %s - %d] -- modbus 未连接！",__FILE__,__FUNCTION__,__LINE__);
+        return ;
+    }
+
+
+   //get base address
+   int baseAddr = m_modbusCommSettings->baseAddr().toInt();
+
+
+
+   QApplication::setOverrideCursor(Qt::WaitCursor);
+
+   switch(functionCode)
+   {
+           case MODBUS_FC_READ_COILS:
+           case MODBUS_FC_READ_DISCRETE_INPUTS:
+           case MODBUS_FC_READ_HOLDING_REGISTERS:
+           case MODBUS_FC_READ_INPUT_REGISTERS:
+                   qFatal("[%s - %s - %d] -- modbus 功能码调用异常 -- (%d) ",__FILE__,__FUNCTION__,__LINE__,functionCode);
+                   break;
+
+           case MODBUS_FC_WRITE_SINGLE_COIL:
+           case MODBUS_FC_WRITE_SINGLE_REGISTER:
+           case MODBUS_FC_WRITE_MULTIPLE_COILS:
+           case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
+                    //modbusWriteData(m_slave,m_functionCode,m_startAddr,m_numOfRegs);
+                    qFatal("[%s - %s - %d] -- modbus 功能码调用异常 -- (%d) ",__FILE__,__FUNCTION__,__LINE__,functionCode);
+                   break;
+           default:
+                   break;
+   }
+   QApplication::setOverrideCursor(Qt::ArrowCursor);
+}
+*/
 /*
 void MainWindow::request()
 {

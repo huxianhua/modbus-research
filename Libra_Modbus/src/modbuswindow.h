@@ -67,6 +67,8 @@ private:
 
     void initExtend();
 
+    QVariantMap readRequest(int slave, int functionCode, int startAddress,int noOfItems);
+
 private slots:
     void showSettingsModbusRTU();
     void showSettingsModbusTCP();
