@@ -60,7 +60,7 @@ void Function_Extend::add_os_style(QMenuBar *menubar,QToolBar *toolbar)
     QAction *action;
     for(int index = 0; index < list_line; index++)
     {
-        action = new QAction(style_name_list.at(index));
+        action = new QAction(style_name_list.at(index),this);
         action->setObjectName(style_name_list.at(index));
         style->addAction(action);
         connect(action,SIGNAL(triggered()),this,SLOT(s_changeStyle()));

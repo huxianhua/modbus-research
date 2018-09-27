@@ -44,9 +44,6 @@ public:
 
 private:
 
-    Function_Extend(const Function_Extend&){}
-    Function_Extend& operator == (const Function_Extend&){}
-
 
     ModbusCommSettings *m_modbusCommSettings;
 
